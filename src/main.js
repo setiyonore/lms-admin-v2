@@ -21,6 +21,9 @@ import router from "./router/index";
 import BlackDashboard from "./plugins/blackDashboard";
 import i18n from "./i18n";
 import "./registerServiceWorker";
+// Set the base URL globally
+Vue.prototype.$baseURL = process.env.VUE_APP_API_BASE_URL;
+Vue.prototype.$tinyKey = process.env.VUE_APP_TINYMCE_KEY
 Vue.use(BlackDashboard);
 Vue.use(VueRouter);
 Vue.use(RouterPrefetch);

@@ -27,7 +27,6 @@
    /* Style untuk link aktif di sidebar */
    .router-link-active {
      background-color: #2c7d59; /* Warna latar belakang untuk link aktif */
-     border-left: 4px solid #42b883; /* Garis sisi untuk menandai link aktif */
      padding-left: 12px; /* Padding kiri untuk estetika */
    }
 </style>
