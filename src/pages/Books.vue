@@ -14,7 +14,7 @@
           <td>{{ row.name }}</td>
           <td>{{ row.year_of_publication }}</td>
           <td class="td-actions text-right" width="17%">
-            <base-button type="info" size="sm" icon>
+            <base-button type="info" size="sm" icon @click="detil(row.id)">
               <i class="tim-icons icon-image-02"></i>
             </base-button>
             <base-button type=" ml-2" size="sm" icon>
@@ -126,9 +126,61 @@
         </template>
       </card>
     </modal>
+    <modal
+      :centered="true"
+      :show="modals.modalDetil"
+      :showClose="true"
+      @close="modals.modalDetil = false"
+      modal-classes="modal-lg"
+    >
+      <template slot="header">
+        <h3 class="modal-title" id="exampleModalLabel">
+          Detil Book: {{ book.name }}
+        </h3>
+      </template>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-6">
+            <img
+              class="img-fluid rounded shadow mb-3"
+              :src="book.img_url_cover"
+              alt="Cover image"
+            />
+          </div>
+          <div class="col-md-6">
+            <h5>Details</h5>
+            <p><strong>ISBN:</strong> {{ book.isbn }}</p>
+            <p>
+              <strong>Year of Publication:</strong>
+              {{ book.year_of_publication }}
+            </p>
+            <p><strong>Author:</strong> {{ book.author }}</p>
+            <p><strong>Publisher:</strong> {{ book.publiser }}</p>
+            <base-button type="default"
+              ><i class="tim-icons icon-bullet-list-67"></i> List Item
+              Books</base-button
+            >
+          </div>
+        </div>
+        <div class="row mt-1">
+          <div class="col-12">
+            <div class="description-text" v-html="book.description"></div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <base-button type="warning" @click="modals.modalDetil = false"
+          >Close</base-button
+        >
+      </div>
+    </modal>
   </div>
 </template>
-
+<style>
+.description-text h1 {
+  color: #011038;
+}
+</style>
 <script>
 import Modal from "@/components/Modal.vue";
 import axios from "axios";
@@ -145,6 +197,7 @@ export default {
     return {
       modals: {
         modal0: false,
+        modalDetil: false,
       },
       books: [],
       authors: [],
@@ -236,6 +289,20 @@ export default {
         } else {
           console.error("Unexpected error:", error);
         }
+      }
+    },
+    async detil(id) {
+      try {
+        const authToken = localStorage.getItem("authToken");
+        const book = await axios.get(this.$baseURL + `/books/${id}`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        this.book = book.data.data;
+        this.book.author = book.data.data.Author.name;
+        this.book.publiser = book.data.data.Publisher.name;
+        this.modals.modalDetil = true;
+      } catch (error) {
+        console.error(error);
       }
     },
   },
