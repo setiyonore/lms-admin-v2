@@ -17,7 +17,7 @@
             <base-button type="info" size="sm" icon @click="detil(row.id)">
               <i class="tim-icons icon-image-02"></i>
             </base-button>
-            <base-button type=" ml-2" size="sm" icon>
+            <base-button type=" ml-2" size="sm" icon @click="edit(row.id)">
               <i class="tim-icons icon-pencil"></i>
             </base-button>
             <base-button type="danger ml-2" size="sm" icon>
@@ -209,12 +209,26 @@ export default {
       error: [],
     };
   },
-  mounted() {
+  async mounted() {
     this.fetchData();
-    console.log(this.tinymceConfig);
   },
   methods: {
-    toggleModal() {
+    async toggleModal() {
+      const authToken = localStorage.getItem("authToken");
+      const authors = await axios.get(this.$baseURL + "/authors", {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      this.authors = authors.data.data.map((authors) => ({
+        id: authors.id,
+        name: authors.name,
+      }));
+      const publishers = await axios.get(this.$baseURL + "/publishers", {
+        headers: { Authorization: `Bearer ${authToken}` },
+      });
+      this.publishers = publishers.data.data.map((publishers) => ({
+        id: publishers.id,
+        name: publishers.name,
+      }));
       this.modals.modal0 = !this.modals.modal0;
       this.book = {
         name: "",
@@ -225,6 +239,7 @@ export default {
         description: "",
         author_id: 0,
         publisher_id: 0,
+        id: 0,
       };
     },
     async fetchData() {
@@ -237,20 +252,6 @@ export default {
           ...book,
           index: index + 1, // Menambahkan properti index ke setiap buku
         }));
-        const authors = await axios.get(this.$baseURL + "/authors", {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-        this.authors = authors.data.data.map((authors) => ({
-          id: authors.id,
-          name: authors.name,
-        }));
-        const publishers = await axios.get(this.$baseURL + "/publishers", {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-        this.publishers = publishers.data.data.map((publishers) => ({
-          id: publishers.id,
-          name: publishers.name,
-        }));
       } catch (error) {
         console.log(error);
       }
@@ -258,19 +259,45 @@ export default {
     async submit() {
       const authToken = localStorage.getItem("authToken");
       try {
-        const response = await axios.post(this.$baseURL + "/books", this.book, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
-        console.log(response);
-        Swal.fire({
-          position: "top-end",
-          icon: "success",
-          title: "Success Save Data",
-          showConfirmButton: false,
-          timer: 3000,
-        });
-        this.fetchData();
-        this.modals.modal0 = false;
+        if (this.book.id === 0) {
+          //new book
+          const response = await axios.post(
+            this.$baseURL + "/books",
+            this.book,
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+          if (response.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Success Save Data",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            this.fetchData();
+            this.modals.modal0 = false;
+          }
+        } else {
+          //update book
+          const response = await axios.put(
+            this.$baseURL + `/books/` + this.book.id,
+            this.book,
+            {
+              headers: { Authorization: `Bearer ${authToken}` },
+            }
+          );
+          if (response.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Success Save Data",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            this.fetchData();
+            this.modals.modal0 = false;
+          }
+        }
       } catch (error) {
         if (error.response && error.response.status === 400) {
           const errorMessages = error.response.data.meta.message;
@@ -301,6 +328,32 @@ export default {
         this.book.author = book.data.data.Author.name;
         this.book.publiser = book.data.data.Publisher.name;
         this.modals.modalDetil = true;
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async edit(id) {
+      try {
+        const authToken = localStorage.getItem("authToken");
+        const authors = await axios.get(this.$baseURL + "/authors", {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        this.authors = authors.data.data.map((authors) => ({
+          id: authors.id,
+          name: authors.name,
+        }));
+        const publishers = await axios.get(this.$baseURL + "/publishers", {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        this.publishers = publishers.data.data.map((publishers) => ({
+          id: publishers.id,
+          name: publishers.name,
+        }));
+        const book = await axios.get(this.$baseURL + `/books/${id}`, {
+          headers: { Authorization: `Bearer ${authToken}` },
+        });
+        this.book = book.data.data;
+        this.modals.modal0 = true;
       } catch (error) {
         console.error(error);
       }
