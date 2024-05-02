@@ -6,7 +6,7 @@ import NotFound from "@/pages/NotFoundPage.vue";
 // Admin pages
 const Dashboard = () =>
   import(/* webpackChunkName: "dashboard" */ "@/pages/Dashboard.vue");
-const BooksPage = () => import("@/pages/Books.vue");
+const BooksPage = () => import("@/pages/Books/Books.vue");
 const LoginPage = () => import("@/pages/Auth/Login.vue");
 
 
