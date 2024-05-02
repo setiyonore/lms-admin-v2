@@ -20,7 +20,7 @@
             <base-button type=" ml-2" size="sm" icon @click="edit(row.id)">
               <i class="tim-icons icon-pencil"></i>
             </base-button>
-            <base-button type="danger ml-2" size="sm" icon>
+            <base-button type="danger ml-2" size="sm" icon @click="del(row.id)">
               <i class="tim-icons icon-simple-remove"></i>
             </base-button>
           </td>
@@ -43,7 +43,7 @@
       >
         <template>
           <div class="text-muted mb-4">
-            <h4>Add New Book</h4>
+            <h4>{{ modals.modalTitle }}</h4>
           </div>
           <form @submit.prevent>
             <base-input
@@ -198,6 +198,7 @@ export default {
       modals: {
         modal0: false,
         modalDetil: false,
+        modalTitle: "",
       },
       books: [],
       authors: [],
@@ -229,6 +230,7 @@ export default {
         id: publishers.id,
         name: publishers.name,
       }));
+      this.modals.modalTitle = "Add New Book";
       this.modals.modal0 = !this.modals.modal0;
       this.book = {
         name: "",
@@ -353,10 +355,43 @@ export default {
           headers: { Authorization: `Bearer ${authToken}` },
         });
         this.book = book.data.data;
+        this.modals.modalTitle = "Edit Book";
         this.modals.modal0 = true;
       } catch (error) {
         console.error(error);
       }
+    },
+    async del(id) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const authToken = localStorage.getItem("authToken");
+            const response = await axios.delete(this.$baseURL + `/books/${id}`, {
+              headers: { Authorization: `Bearer ${authToken}` },
+            });
+            if (response.status === 200) {
+              Swal.fire({
+                title: "Deleted!",
+                text: "Your data has been deleted.",
+                icon: "success",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+              this.fetchData();
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      });
     },
   },
 };
