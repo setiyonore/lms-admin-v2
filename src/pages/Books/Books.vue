@@ -118,10 +118,10 @@
             </base-input>
           </form>
           <div class="text-right">
-            <base-button type="warning" @click="modals.modal0 = false"
+            <base-button type="warning btn-sm" @click="modals.modal0 = false"
               >Close</base-button
             >
-            <base-button type="success ml-2" @click="submit">Save</base-button>
+            <base-button type="success ml-2 btn-sm" @click="submit">Save</base-button>
           </div>
         </template>
       </card>
@@ -169,7 +169,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <base-button type="warning" @click="modals.modalDetil = false"
+        <base-button type="warning btn-sm" @click="modals.modalDetil = false"
           >Close</base-button
         >
       </div>

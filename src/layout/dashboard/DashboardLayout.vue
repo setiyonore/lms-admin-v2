@@ -8,9 +8,14 @@
           icon="tim-icons icon-chart-pie-36"
         />
         <sidebar-link
-        to="/books"
-        :name="$t('sidebar.books')"
-        icon="tim-icons icon-book-bookmark"
+          to="/books"
+          :name="$t('sidebar.books')"
+          icon="tim-icons icon-book-bookmark"
+        />
+        <sidebar-link
+          to="/members"
+          :name="$t('sidebar.members')"
+          icon="tim-icons icon-single-02"
         />
       </template>
     </side-bar>
@@ -24,11 +29,11 @@
   </div>
 </template>
 <style lang="scss">
-   /* Style untuk link aktif di sidebar */
-   .router-link-active {
-     background-color: #2c7d59; /* Warna latar belakang untuk link aktif */
-     padding-left: 12px; /* Padding kiri untuk estetika */
-   }
+/* Style untuk link aktif di sidebar */
+.router-link-active {
+  background-color: #2c7d59; /* Warna latar belakang untuk link aktif */
+  padding-left: 12px; /* Padding kiri untuk estetika */
+}
 </style>
 <script>
 import TopNavbar from "./TopNavbar.vue";
