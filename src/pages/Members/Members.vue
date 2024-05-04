@@ -52,7 +52,7 @@
             </base-input>
             <base-input
               label="Phone Number"
-              type="number"
+              type="text"
               placeholder="Enter Phone Number"
               v-model="member.phone_number"
             >
@@ -123,10 +123,29 @@ export default {
       this.modals.modalTitle = "Add New Member";
       this.modals.modalForm = true;
     },
+    async edit(id) {
+      try {
+        const authToken = localStorage.getItem("authToken");
+        const response = await axios.get(
+          this.$baseURL + `/library_members/${id}`,
+          {
+            headers: { Authorization: `Bearer ${authToken}` },
+          }
+        );
+        if (response.status === 200) {
+          this.member = response.data.data;
+          this.modals.modalTitle = "Edit Member";
+          this.modals.modalForm = true;
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
     async submit() {
+      const authToken = localStorage.getItem("authToken");
+
       if (this.member.id === 0) {
         //add new member
-        const authToken = localStorage.getItem("authToken");
         try {
           const response = await axios.post(
             this.$baseURL + "/library_members",
@@ -165,7 +184,46 @@ export default {
           }
         }
       } else {
-        console.log("update");
+        //update member
+        try {
+          const response = await axios.put(
+            this.$baseURL + `/library_members/` + this.member.id,
+            this.member,
+            {
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            }
+          );
+          if (response.status === 200) {
+            Swal.fire({
+              icon: "success",
+              title: "Success Save Data",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            this.fetchData();
+            this.modals.modalForm = false;
+          }
+        } catch (error) {
+          if (error.response && error.response.status === 400) {
+            const errorMessages = error.response.data.meta.message;
+            this.error = errorMessages.map((msg) => `${msg}`).join("");
+            Swal.fire({
+              icon: "error",
+              title: "Failed To Save Data",
+              html: this.error,
+              showConfirmButton: true,
+            });
+            console.error("Submission error:", this.error);
+          } else if (error.response && error.response.status === 500) {
+            const errorMessages = error.response.data.meta.message;
+            this.error = errorMessages;
+            console.error("Server error:", this.error);
+          } else {
+            console.error("Unexpected error:", error);
+          }
+        }
       }
     },
   },
