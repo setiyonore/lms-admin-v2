@@ -7,7 +7,8 @@ import NotFound from "@/pages/NotFoundPage.vue";
 const Dashboard = () =>
   import(/* webpackChunkName: "dashboard" */ "@/pages/Dashboard.vue");
 const BooksPage = () => import("@/pages/Books/Books.vue");
-const MembersPage = () => import("@/pages/Members/Members.vue")
+const MembersPage = () => import("@/pages/Members/Members.vue");
+const UsersPage = () => import("@/pages/Users/Users.vue");
 const LoginPage = () => import("@/pages/Auth/Login.vue");
 
 
@@ -34,6 +35,12 @@ const routes = [
         path: "members",
         name: "members",
         component: MembersPage,
+        beforeEnter: isAuthenticated,
+      },
+      {
+        path: "users",
+        name: "users",
+        component: UsersPage,
         beforeEnter: isAuthenticated,
       },
     ],

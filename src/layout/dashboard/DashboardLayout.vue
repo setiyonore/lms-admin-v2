@@ -15,6 +15,11 @@
         <sidebar-link
           to="/members"
           :name="$t('sidebar.members')"
+          icon="tim-icons icon-badge"
+        />
+        <sidebar-link
+          to="/users"
+          :name="$t('sidebar.users')"
           icon="tim-icons icon-single-02"
         />
       </template>
