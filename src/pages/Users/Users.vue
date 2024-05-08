@@ -233,6 +233,41 @@ export default {
         console.error(error);
       }
     },
+    async del(id) {
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const authToken = localStorage.getItem("authToken");
+            const response = await axios.delete(
+              this.$baseURL + `/users/${id}`,
+              {
+                headers: { Authorization: `Bearer ${authToken}` },
+              }
+            );
+            if (response.status === 200) {
+              Swal.fire({
+                title: "Deleted!",
+                text: "Your data has been deleted.",
+                icon: "success",
+                showConfirmButton: false,
+                timer: 1500,
+              });
+              this.fetchData();
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
+      });
+    },
   },
 };
 </script>
