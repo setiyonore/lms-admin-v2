@@ -199,7 +199,7 @@
           <base-button type="primary btn-sm" @click="toggleModal">
             Add Item Book
           </base-button>
-          <base-table :data="bookItem">
+          <base-table :data="bookItems">
             <template slot="columns">
               <th>No</th>
               <th>ISBN</th>
@@ -275,8 +275,12 @@ export default {
       authors: [],
       publishers: [],
       book: {},
-      bookId: 0,
-      bookItem: [],
+      bookItems: [],
+      bookItem: {
+        id_book: 0,
+        isbn: "",
+        status: 1,
+      },
       tinymceConfig: {
         api_key: this.$tinyKey,
       },
@@ -394,7 +398,6 @@ export default {
       }
     },
     async detil(id) {
-      this.bookId = id;
       try {
         const authToken = localStorage.getItem("authToken");
         const book = await axios.get(this.$baseURL + `/books/${id}`, {
@@ -482,7 +485,7 @@ export default {
           }
         );
         if (response.status == 200) {
-          this.bookItem = response.data.data.map((item_book, index) => ({
+          this.bookItems = response.data.data.map((item_book, index) => ({
             ...item_book,
             index: index + 1,
           }));
@@ -492,6 +495,10 @@ export default {
       } catch (error) {
         console.error(error);
       }
+    },
+    createItemBook(id) {
+      this.bookItem.id_book = id;
+      this.bookItem.isbn = "";
     },
   },
 };
