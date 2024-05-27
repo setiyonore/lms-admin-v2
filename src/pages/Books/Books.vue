@@ -3,38 +3,15 @@
     <base-button type="primary" @click="toggleModal"> Add Book </base-button>
     <card class="mt-3">
       <h4 class="card-title">List Books</h4>
-      <base-table :data="books">
-        <template slot="columns">
-          <th>No</th>
-          <th>Title</th>
-          <th>Year Of Publication</th>
-        </template>
-        <template slot-scope="{ row }">
-          <td>{{ row.index }}</td>
-          <td>{{ row.name }}</td>
-          <td>{{ row.year_of_publication }}</td>
-          <td class="td-actions text-right" width="17%">
-            <base-button
-              type="primary"
-              size="sm"
-              icon
-              @click="getListItem(row.id)"
-            >
-              <i class="tim-icons icon-bullet-list-67"></i>
-            </base-button>
-            <base-button type="info ml-2" size="sm" icon @click="detil(row.id)">
-              <i class="tim-icons icon-image-02"></i>
-            </base-button>
-            <base-button type=" ml-2" size="sm" icon @click="edit(row.id)">
-              <i class="tim-icons icon-pencil"></i>
-            </base-button>
-            <base-button type="danger ml-2" size="sm" icon @click="del(row.id)">
-              <i class="tim-icons icon-simple-remove"></i>
-            </base-button>
-          </td>
-        </template>
-      </base-table>
+      <TableIndexBooks
+        :books="books"
+        @list-item="getListItem"
+        @detil="detil"
+        @edit="edit"
+        @del="del"
+      />
     </card>
+    <!-- Modal Add Book -->
     <modal
       body-classes="p-0"
       :centered="true"
@@ -136,6 +113,7 @@
         </template>
       </card>
     </modal>
+    <!-- Modal Detail Book -->
     <modal
       :centered="true"
       :show="modals.modalDetil"
@@ -148,38 +126,14 @@
           Detil Book: {{ book.name }}
         </h3>
       </template>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-md-6">
-            <img
-              class="img-fluid rounded shadow mb-3"
-              :src="book.img_url_cover"
-              alt="Cover image"
-            />
-          </div>
-          <div class="col-md-6">
-            <h5>Details</h5>
-            <p><strong>ISBN:</strong> {{ book.isbn }}</p>
-            <p>
-              <strong>Year of Publication:</strong>
-              {{ book.year_of_publication }}
-            </p>
-            <p><strong>Author:</strong> {{ book.author }}</p>
-            <p><strong>Publisher:</strong> {{ book.publiser }}</p>
-          </div>
-        </div>
-        <div class="row mt-1">
-          <div class="col-12">
-            <div class="description-text" v-html="book.description"></div>
-          </div>
-        </div>
-      </div>
+      <DetilBook :book="book" />
       <div class="modal-footer">
         <base-button type="warning btn-sm" @click="modals.modalDetil = false"
           >Close</base-button
         >
       </div>
     </modal>
+    <!-- Modal List Item Book -->
     <modal
       body-classes="p-0"
       :centered="true"
@@ -199,41 +153,7 @@
           <base-button type="primary btn-sm" @click="toggleModal">
             Add Item Book
           </base-button>
-          <base-table :data="bookItems">
-            <template slot="columns">
-              <th>No</th>
-              <th>ISBN</th>
-              <th>Status</th>
-            </template>
-            <template slot-scope="{ row }">
-              <td>{{ row.index }}</td>
-              <td>{{ row.Isbn }}</td>
-              <td v-if="row.Status == 1">
-                <span class="badge badge-success text-dark">Tersedia</span>
-              </td>
-              <td v-else>
-                <span class="badge badge-danger text-dark">Tidak Tersedia</span>
-              </td>
-              <td class="td-actions text-right" width="17%">
-                <base-button
-                  type="default"
-                  size="sm"
-                  icon
-                  data-toggle="collapse"
-                >
-                  <i class="tim-icons icon-pencil"></i>
-                </base-button>
-                <base-button
-                  type="danger ml-2"
-                  size="sm"
-                  icon
-                  data-toggle="collapse"
-                >
-                  <i class="tim-icons icon-simple-remove"></i>
-                </base-button>
-              </td>
-            </template>
-          </base-table>
+          <ItemsBook :bookItems="bookItems" />
           <div class="text-right">
             <base-button
               type="warning btn-sm"
@@ -254,14 +174,19 @@
 <script>
 import Modal from "@/components/Modal.vue";
 import axios from "axios";
-import { BaseTable } from "@/components";
 import Editor from "@tinymce/tinymce-vue";
 import Swal from "sweetalert2";
+import DetilBook from "./components/DetilBook.vue";
+import TableIndexBooks from "./components/TableIndexBooks.vue";
+import ItemsBook from "./components/ItemsBook.vue";
+
 export default {
   components: {
     modal: Modal,
-    BaseTable,
     Editor,
+    DetilBook,
+    TableIndexBooks,
+    ItemsBook,
   },
   data() {
     return {
