@@ -14,7 +14,15 @@
           <td>{{ row.name }}</td>
           <td>{{ row.year_of_publication }}</td>
           <td class="td-actions text-right" width="17%">
-            <base-button type="info" size="sm" icon @click="detil(row.id)">
+            <base-button
+              type="primary"
+              size="sm"
+              icon
+              @click="getListItem(row.id)"
+            >
+              <i class="tim-icons icon-bullet-list-67"></i>
+            </base-button>
+            <base-button type="info ml-2" size="sm" icon @click="detil(row.id)">
               <i class="tim-icons icon-image-02"></i>
             </base-button>
             <base-button type=" ml-2" size="sm" icon @click="edit(row.id)">
@@ -121,7 +129,9 @@
             <base-button type="warning btn-sm" @click="modals.modal0 = false"
               >Close</base-button
             >
-            <base-button type="success ml-2 btn-sm" @click="submit">Save</base-button>
+            <base-button type="success ml-2 btn-sm" @click="submit"
+              >Save</base-button
+            >
           </div>
         </template>
       </card>
@@ -156,10 +166,6 @@
             </p>
             <p><strong>Author:</strong> {{ book.author }}</p>
             <p><strong>Publisher:</strong> {{ book.publiser }}</p>
-            <base-button type="default"
-              ><i class="tim-icons icon-bullet-list-67"></i> List Item
-              Books</base-button
-            >
           </div>
         </div>
         <div class="row mt-1">
@@ -173,6 +179,70 @@
           >Close</base-button
         >
       </div>
+    </modal>
+    <modal
+      body-classes="p-0"
+      :centered="true"
+      :show="modals.modalItemBook"
+      :showClose="false"
+      @close="modals.modalItemBook = true"
+      modal-classes="modal-lg"
+    >
+      <card
+        type="secondary"
+        header-classes="bg-white pb-5"
+        body-classes="px-lg-5 py-lg-5"
+        class="border-0 mb-0"
+      >
+        <template>
+          <h4 class="card-title">List Items Book</h4>
+          <base-button type="primary btn-sm" @click="toggleModal">
+            Add Item Book
+          </base-button>
+          <base-table :data="bookItem">
+            <template slot="columns">
+              <th>No</th>
+              <th>ISBN</th>
+              <th>Status</th>
+            </template>
+            <template slot-scope="{ row }">
+              <td>{{ row.index }}</td>
+              <td>{{ row.Isbn }}</td>
+              <td v-if="row.Status == 1">
+                <span class="badge badge-success text-dark">Tersedia</span>
+              </td>
+              <td v-else>
+                <span class="badge badge-danger text-dark">Tidak Tersedia</span>
+              </td>
+              <td class="td-actions text-right" width="17%">
+                <base-button
+                  type="default"
+                  size="sm"
+                  icon
+                  data-toggle="collapse"
+                >
+                  <i class="tim-icons icon-pencil"></i>
+                </base-button>
+                <base-button
+                  type="danger ml-2"
+                  size="sm"
+                  icon
+                  data-toggle="collapse"
+                >
+                  <i class="tim-icons icon-simple-remove"></i>
+                </base-button>
+              </td>
+            </template>
+          </base-table>
+          <div class="text-right">
+            <base-button
+              type="warning btn-sm"
+              @click="modals.modalItemBook = false"
+              >Close</base-button
+            >
+          </div>
+        </template>
+      </card>
     </modal>
   </div>
 </template>
@@ -199,11 +269,14 @@ export default {
         modal0: false,
         modalDetil: false,
         modalTitle: "",
+        modalItemBook: false,
       },
       books: [],
       authors: [],
       publishers: [],
       book: {},
+      bookId: 0,
+      bookItem: [],
       tinymceConfig: {
         api_key: this.$tinyKey,
       },
@@ -321,6 +394,7 @@ export default {
       }
     },
     async detil(id) {
+      this.bookId = id;
       try {
         const authToken = localStorage.getItem("authToken");
         const book = await axios.get(this.$baseURL + `/books/${id}`, {
@@ -374,9 +448,12 @@ export default {
         if (result.isConfirmed) {
           try {
             const authToken = localStorage.getItem("authToken");
-            const response = await axios.delete(this.$baseURL + `/books/${id}`, {
-              headers: { Authorization: `Bearer ${authToken}` },
-            });
+            const response = await axios.delete(
+              this.$baseURL + `/books/${id}`,
+              {
+                headers: { Authorization: `Bearer ${authToken}` },
+              }
+            );
             if (response.status === 200) {
               Swal.fire({
                 title: "Deleted!",
@@ -392,6 +469,29 @@ export default {
           }
         }
       });
+    },
+    async getListItem(id) {
+      try {
+        const authToken = localStorage.getItem("authToken");
+        const response = await axios.get(
+          this.$baseURL + `/item_book/getByIdBook/` + id,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+        if (response.status == 200) {
+          this.bookItem = response.data.data.map((item_book, index) => ({
+            ...item_book,
+            index: index + 1,
+          }));
+        }
+        this.modals.modalItemBook = true;
+        this.modals.modalDetil = false;
+      } catch (error) {
+        console.error(error);
+      }
     },
   },
 };
