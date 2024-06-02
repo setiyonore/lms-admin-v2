@@ -150,7 +150,7 @@
       >
         <template>
           <h4 class="card-title">List Items Book</h4>
-          <base-button type="primary btn-sm" @click="toggleModal">
+          <base-button type="primary btn-sm" @click="createItemBook">
             Add Item Book
           </base-button>
           <ItemsBook :bookItems="bookItems" />
@@ -399,6 +399,7 @@ export default {
       });
     },
     async getListItem(id) {
+      this.bookItem.id_book = id;
       try {
         const authToken = localStorage.getItem("authToken");
         const response = await axios.get(
@@ -421,9 +422,68 @@ export default {
         console.error(error);
       }
     },
-    createItemBook(id) {
-      this.bookItem.id_book = id;
+    async getDataListItem() {
+      //get list item
+      try {
+        const authToken = localStorage.getItem("authToken");
+        const response = await axios.get(
+          this.$baseURL + `/item_book/getByIdBook/` + this.bookItem.id_book,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+        if (response.status == 200) {
+          this.bookItems = response.data.data.map((item_book, index) => ({
+            ...item_book,
+            index: index + 1,
+          }));
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async createItemBook() {
       this.bookItem.isbn = "";
+      const isbn = "";
+      await Swal.fire({
+        title: "Add Item Book",
+        input: "text",
+        inputLabel: "ISBN",
+        isbn,
+        showCancelButton: true,
+        inputValidator: (isbn) => {
+          if (!isbn) {
+            return "Please Input ISBN";
+          } else {
+            this.bookItem.isbn = isbn;
+            try {
+              //add item boook
+              const authToken = localStorage.getItem("authToken");
+              const response = axios.post(
+                this.$baseURL + "/item_book",
+                this.bookItem,
+                {
+                  headers: {
+                    Authorization: `Bearer ${authToken}`,
+                  },
+                }
+              );
+            } catch (error) {
+              console.error(error);
+            }
+          }
+        },
+      });
+      //alert after add data
+      Swal.fire({
+        icon: "success",
+        title: "Success Save Data",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      this.getDataListItem();
     },
   },
 };
