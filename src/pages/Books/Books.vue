@@ -153,7 +153,7 @@
           <base-button type="primary btn-sm" @click="createItemBook">
             Add Item Book
           </base-button>
-          <ItemsBook :bookItems="bookItems" />
+          <ItemsBook :bookItems="bookItems" @edit="editItemBook" />
           <div class="text-right">
             <base-button
               type="warning btn-sm"
@@ -446,23 +446,89 @@ export default {
     },
     async createItemBook() {
       this.bookItem.isbn = "";
+      this.bookItem.status = 1;
       const isbn = "";
-      await Swal.fire({
+
+      const { value: newIsbn } = await Swal.fire({
         title: "Add Item Book",
         input: "text",
         inputLabel: "ISBN",
-        isbn,
+        inputValue: isbn,
         showCancelButton: true,
-        inputValidator: (isbn) => {
-          if (!isbn) {
+        inputValidator: (value) => {
+          if (!value) {
             return "Please Input ISBN";
-          } else {
-            this.bookItem.isbn = isbn;
+          }
+          return null;
+        },
+      });
+
+      if (newIsbn) {
+        this.bookItem.isbn = newIsbn;
+        try {
+          const authToken = localStorage.getItem("authToken");
+          const response = await axios.post(
+            this.$baseURL + "/item_book",
+            this.bookItem,
+            {
+              headers: {
+                Authorization: `Bearer ${authToken}`,
+              },
+            }
+          );
+
+          if (response.status === 200) {
+            await Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: "Book item created successfully",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            this.getDataListItem();
+          }
+        } catch (error) {
+          console.error(error);
+          await Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Failed to create book item",
+          });
+        }
+      }
+    },
+    async editItemBook(id) {
+      const authToken = localStorage.getItem("authToken");
+      try {
+        const response = await axios.get(this.$baseURL + "/item_book/" + id, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        if (response.status == 200) {
+          this.bookItem.id_book = response.data.data.IdBook;
+          this.bookItem.isbn = response.data.data.Isbn;
+          this.bookItem.status = response.data.data.Status;
+          let isbn = this.bookItem.isbn;
+          const { value: newIsbn } = await Swal.fire({
+            title: "Edit Item Book",
+            input: "text",
+            inputLabel: "ISBN",
+            inputValue: isbn,
+            showCancelButton: true,
+            inputValidator: (value) => {
+              if (!value) {
+                return "Please Input ISBN";
+              }
+              return null;
+            },
+          });
+
+          if (newIsbn) {
+            this.bookItem.isbn = newIsbn;
             try {
-              //add item boook
-              const authToken = localStorage.getItem("authToken");
-              const response = axios.post(
-                this.$baseURL + "/item_book",
+              const updateResponse = await axios.put(
+                this.$baseURL + "/item_book/" + id,
                 this.bookItem,
                 {
                   headers: {
@@ -470,20 +536,35 @@ export default {
                   },
                 }
               );
+
+              if (updateResponse.status == 200) {
+                await Swal.fire({
+                  icon: "success",
+                  title: "Success",
+                  text: "Book item updated successfully",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+                this.getDataListItem();
+              }
             } catch (error) {
               console.error(error);
+              await Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Failed to update book item",
+              });
             }
           }
-        },
-      });
-      //alert after add data
-      Swal.fire({
-        icon: "success",
-        title: "Success Save Data",
-        showConfirmButton: false,
-        timer: 1500,
-      });
-      this.getDataListItem();
+        }
+      } catch (error) {
+        console.error(error);
+        await Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Failed to fetch book item details",
+        });
+      }
     },
   },
 };

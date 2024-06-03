@@ -16,7 +16,13 @@
           <span class="badge badge-danger text-dark">Tidak Tersedia</span>
         </td>
         <td class="td-actions text-right" width="17%">
-          <base-button type="default" size="sm" icon data-toggle="collapse">
+          <base-button
+            @click="edit(row.ID)"
+            type="default"
+            size="sm"
+            icon
+            data-toggle="collapse"
+          >
             <i class="tim-icons icon-pencil"></i>
           </base-button>
           <base-button type="danger ml-2" size="sm" icon data-toggle="collapse">
@@ -35,6 +41,11 @@ export default {
   },
   props: {
     bookItems: Array,
+  },
+  methods: {
+    async edit(id) {
+      this.$emit("edit", id);
+    },
   },
 };
 </script>
