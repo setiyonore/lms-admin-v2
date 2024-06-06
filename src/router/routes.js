@@ -10,9 +10,7 @@ const BooksPage = () => import("@/pages/Books/Books.vue");
 const MembersPage = () => import("@/pages/Members/Members.vue");
 const UsersPage = () => import("@/pages/Users/Users.vue");
 const LoginPage = () => import("@/pages/Auth/Login.vue");
-
-
-
+const BorrowingPage = () => import("@/pages/Borrowing/Borrowing.vue");
 const routes = [
   {
     path: "/",
@@ -32,6 +30,12 @@ const routes = [
         beforeEnter: isAuthenticated,
       },
       {
+        path: "borrowing",
+        name: "borrowing",
+        component: BorrowingPage,
+        beforeEnter: isAuthenticated,
+      },
+      {
         path: "members",
         name: "members",
         component: MembersPage,
@@ -47,7 +51,7 @@ const routes = [
   },
   {
     path: "/login",
-    component: LoginPage
+    component: LoginPage,
   },
   { path: "*", component: NotFound },
 ];

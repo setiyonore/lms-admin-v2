@@ -25,9 +25,6 @@
           >
             <i class="tim-icons icon-pencil"></i>
           </base-button>
-          <base-button type="danger ml-2" size="sm" icon data-toggle="collapse">
-            <i class="tim-icons icon-simple-remove"></i>
-          </base-button>
         </td>
       </template>
     </base-table>

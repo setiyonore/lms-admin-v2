@@ -13,6 +13,11 @@
           icon="tim-icons icon-book-bookmark"
         />
         <sidebar-link
+          to="borrowing"
+          :name="$t('sidebar.borrowing')"
+          icon="tim-icons icon-notes"
+        />
+        <sidebar-link
           to="/members"
           :name="$t('sidebar.members')"
           icon="tim-icons icon-badge"
@@ -45,11 +50,13 @@ import TopNavbar from "./TopNavbar.vue";
 import ContentFooter from "./ContentFooter.vue";
 import DashboardContent from "./Content.vue";
 import MobileMenu from "./MobileMenu";
+import SidebarLink from "../../components/SidebarPlugin/SidebarLink.vue";
 export default {
   components: {
     TopNavbar,
     ContentFooter,
     DashboardContent,
+    SidebarLink,
   },
   methods: {
     toggleSidebar() {

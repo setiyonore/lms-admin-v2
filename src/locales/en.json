@@ -114,6 +114,7 @@
     "rtlSupport": "RTL Support",
     "books": "Books",
     "members": "Members",
-    "users": "Users"
+    "users": "Users",
+    "borrowing":"Borrowing"
   }
 }
