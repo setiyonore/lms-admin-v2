@@ -17,6 +17,11 @@
         <td v-else>
           <span class="badge badge-warning text-dark">un returned</span>
         </td>
+        <td>
+          <base-button type="info ml-2" size="sm" icon @click="detil(row.id)">
+            <i class="tim-icons icon-image-02"></i>
+          </base-button>
+        </td>
       </template>
     </base-table>
   </div>
